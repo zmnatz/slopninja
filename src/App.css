@@ -83,11 +83,38 @@
   text-align: center;
 }
 
-.btn-row {
-  display: flex;
-  flex-wrap: wrap;
+/* Mode buttons are the same square size. Columns fill the row and the grid stays centered. */
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 200px));
   justify-content: center;
   gap: 20px;
+  width: 100%;
+  max-width: 560px;
+}
+
+.mode-button {
+  aspect-ratio: 1;
+  width: 100%;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 28px;
+}
+
+.mode-icon {
+  font-size: 64px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.mode-label {
+  font-size: 18px;
+  line-height: 1.1;
+  text-align: center;
 }
 
 button {
@@ -127,16 +154,17 @@ button:active {
     font-size: 18px;
   }
 
-  .btn-row {
-    flex-direction: column;
-    width: 100%;
-    max-width: 320px;
+  .mode-grid {
+    grid-template-columns: repeat(2, minmax(120px, 160px));
+    gap: 14px;
   }
 
-  button {
-    width: 100%;
-    padding: 14px 26px;
-    font-size: 18px;
+  .mode-icon {
+    font-size: 48px;
+  }
+
+  .mode-label {
+    font-size: 15px;
   }
 }
 
