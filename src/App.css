@@ -1,0 +1,148 @@
+/* Full-screen play area. Touch is handled by the canvas, so the page itself never scrolls or zooms. */
+.app {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.game-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.hud {
+  position: absolute;
+  left: calc(25px + env(safe-area-inset-left));
+  right: calc(25px + env(safe-area-inset-right));
+  display: flex;
+  justify-content: space-between;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--text);
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.hud-bottom {
+  bottom: calc(20px + env(safe-area-inset-bottom));
+}
+
+.hud-top {
+  top: calc(20px + env(safe-area-inset-top));
+  transform: rotate(180deg);
+}
+
+.divider {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--border);
+  pointer-events: none;
+  z-index: 4;
+}
+
+.menu {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.menu h1 {
+  margin: 0 0 10px;
+  font-size: 52px;
+  line-height: 1.1;
+  color: #ffaa00;
+  letter-spacing: 2px;
+  text-align: center;
+  text-shadow: 3px 3px 0 #ff3300, 5px 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.menu p {
+  margin: 0 0 30px;
+  padding: 0 20px;
+  font-size: 18px;
+  color: var(--text-light);
+  text-align: center;
+}
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+button {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 16px 35px;
+  font: inherit;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #111;
+  background: linear-gradient(to bottom, var(--accent), var(--accent-deep));
+  border: none;
+  border-radius: 40px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+button:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #b36b00, 0 5px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* iPhone in portrait: the screen is narrow, so stack the buttons and shrink the type. */
+@media (orientation: portrait) and (max-width: 600px) {
+  .menu h1 {
+    font-size: 40px;
+  }
+
+  .menu p {
+    font-size: 16px;
+  }
+
+  .hud {
+    font-size: 18px;
+  }
+
+  .btn-row {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px 26px;
+    font-size: 18px;
+  }
+}
+
+/* iPad in landscape: the default sizes above already fit, so only the gutters need care. */
+@media (orientation: landscape) and (min-width: 768px) {
+  .hud {
+    font-size: 24px;
+  }
+}
