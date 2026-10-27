@@ -6,12 +6,20 @@ describe("transition", () => {
     expect(transition("menu", { type: "start" })).toBe("playing");
   });
 
-  it("moves a finished single-player round to the leaderboard", () => {
-    expect(transition("playing", { type: "ended", mode: 1 })).toBe("leaderboard");
+  it("asks for a name when a single-player round makes the top 10", () => {
+    expect(transition("playing", { type: "ended", mode: 1, qualifies: true })).toBe("naming");
+  });
+
+  it("shows the leaderboard when a single-player round does not make the top 10", () => {
+    expect(transition("playing", { type: "ended", mode: 1, qualifies: false })).toBe("leaderboard");
   });
 
   it("moves a finished two-player round to the game-over screen", () => {
-    expect(transition("playing", { type: "ended", mode: 2 })).toBe("over");
+    expect(transition("playing", { type: "ended", mode: 2, qualifies: false })).toBe("over");
+  });
+
+  it("shows the leaderboard once a name is entered", () => {
+    expect(transition("naming", { type: "named" })).toBe("leaderboard");
   });
 
   it("starts a new game from the game-over screen", () => {
@@ -23,6 +31,6 @@ describe("transition", () => {
   });
 
   it("ignores an end event when no game is running", () => {
-    expect(transition("menu", { type: "ended", mode: 1 })).toBe("menu");
+    expect(transition("menu", { type: "ended", mode: 1, qualifies: true })).toBe("menu");
   });
 });

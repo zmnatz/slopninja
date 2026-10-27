@@ -109,6 +109,44 @@
   color: var(--accent);
 }
 
+/* Three large name slots, and an A-Z pad. Both are buttons and text, so no system keyboard opens. */
+.name-slots {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.slot {
+  width: 92px;
+  height: 116px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 88px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--accent);
+  border: 4px solid var(--border);
+  border-radius: 16px;
+}
+
+.letter-pad {
+  display: grid;
+  grid-template-columns: repeat(7, 56px);
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.letter-pad button {
+  width: 56px;
+  height: 56px;
+  min-width: 44px;
+  padding: 0;
+  font-size: 24px;
+  border-radius: 12px;
+}
+
 .btn-row {
   display: flex;
   flex-wrap: wrap;

@@ -4,8 +4,10 @@ import { GameCanvas } from "./components/GameCanvas";
 import { Hud } from "./components/Hud";
 import { Leaderboard } from "./components/Leaderboard";
 import { Menu } from "./components/Menu";
+import { NameEntry } from "./components/NameEntry";
 import { createGame, describeResult, summarize } from "./game/engine";
-import { browserStorage, loadLeaderboard } from "./game/leaderboardStore";
+import { insertScore, qualifies } from "./game/leaderboard";
+import { browserStorage, loadLeaderboard, saveLeaderboard } from "./game/leaderboardStore";
 import type { Game, GameMode, Snapshot } from "./game/types";
 import { type Screen, transition } from "./screen";
 
@@ -22,9 +24,22 @@ export default function App() {
   const handleChange = useCallback((next: Snapshot) => {
     setSnapshot(next);
     if (next.status === "over") {
-      setScreen((current) => transition(current, { type: "ended", mode: next.mode }));
+      const board = loadLeaderboard(browserStorage());
+      const event = {
+        type: "ended" as const,
+        mode: next.mode,
+        qualifies: qualifies(board, next.bottom.score),
+      };
+      setScreen((current) => transition(current, event));
     }
   }, []);
+
+  const submitName = (name: string) => {
+    const store = browserStorage();
+    const score = snapshot?.bottom.score ?? 0;
+    saveLeaderboard(store, insertScore(loadLeaderboard(store), { name, score }));
+    setScreen((current) => transition(current, { type: "named" }));
+  };
 
   const startGame = (mode: GameMode) => {
     const next = createGame(mode, window.innerWidth, window.innerHeight);
@@ -52,6 +67,10 @@ export default function App() {
             </>
           )}
         </>
+      )}
+
+      {screen === "naming" && snapshot && (
+        <NameEntry score={snapshot.bottom.score} onSubmit={submitName} />
       )}
 
       {screen === "leaderboard" && (
