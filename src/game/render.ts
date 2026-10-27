@@ -1,3 +1,4 @@
+import { inSide, midline, sideRect, type Rect } from "./playfield";
 import type {
   Field,
   Fruit,
@@ -17,13 +18,6 @@ const DIVIDER = "rgba(255, 255, 255, 0.3)";
 const TRAIL = "#00ffff";
 const ELIMINATED = "#ff3333";
 
-interface Rect {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
 export function drawGame(ctx: Ctx, game: Game): void {
   ctx.fillStyle = FADE;
   ctx.fillRect(0, 0, game.width, game.height);
@@ -39,37 +33,20 @@ export function drawGame(ctx: Ctx, game: Game): void {
 
 function drawSplitScreen(ctx: Ctx, game: Game): void {
   const { width, height } = game;
-  const midY = height / 2;
 
-  // The top player sits across the table, so their half is drawn turned around.
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(0, 0, width, midY);
-  ctx.clip();
-  ctx.translate(width, midY);
-  ctx.rotate(Math.PI);
-  drawField(ctx, game.top);
-  ctx.restore();
-  if (game.top.lives <= 0) {
-    drawEliminated(ctx, { x: 0, y: 0, width, height: midY }, true);
-  }
+  // The top player's half is drawn in their flipped frame, so it reads from across the table.
+  inSide(ctx, width, height, "top", () => drawField(ctx, game.top));
+  if (game.top.lives <= 0) drawEliminated(ctx, sideRect(width, height, "top"), true);
 
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(0, midY, width, midY);
-  ctx.clip();
-  ctx.translate(0, midY);
-  drawField(ctx, game.bottom);
-  ctx.restore();
-  if (game.bottom.lives <= 0) {
-    drawEliminated(ctx, { x: 0, y: midY, width, height: midY }, false);
-  }
+  inSide(ctx, width, height, "bottom", () => drawField(ctx, game.bottom));
+  if (game.bottom.lives <= 0) drawEliminated(ctx, sideRect(width, height, "bottom"), false);
 
+  const y = midline(height);
   ctx.strokeStyle = DIVIDER;
   ctx.lineWidth = 4;
   ctx.beginPath();
-  ctx.moveTo(0, midY);
-  ctx.lineTo(width, midY);
+  ctx.moveTo(0, y);
+  ctx.lineTo(width, y);
   ctx.stroke();
 }
 
