@@ -2,8 +2,10 @@ import { useCallback, useState } from "react";
 import "./App.css";
 import { GameCanvas } from "./components/GameCanvas";
 import { Hud } from "./components/Hud";
+import { Leaderboard } from "./components/Leaderboard";
 import { Menu } from "./components/Menu";
 import { createGame, describeResult, summarize } from "./game/engine";
+import { browserStorage, loadLeaderboard } from "./game/leaderboardStore";
 import type { Game, GameMode, Snapshot } from "./game/types";
 import { type Screen, transition } from "./screen";
 
@@ -19,7 +21,9 @@ export default function App() {
 
   const handleChange = useCallback((next: Snapshot) => {
     setSnapshot(next);
-    if (next.status === "over") setScreen((current) => transition(current, { type: "ended" }));
+    if (next.status === "over") {
+      setScreen((current) => transition(current, { type: "ended", mode: next.mode }));
+    }
   }, []);
 
   const startGame = (mode: GameMode) => {
@@ -28,6 +32,8 @@ export default function App() {
     setGame(next);
     setScreen((current) => transition(current, { type: "start" }));
   };
+
+  const newGame = () => setScreen((current) => transition(current, { type: "newGame" }));
 
   const playing = screen === "playing";
   const menu = screen === "over" && snapshot ? describeResult(snapshot) : INTRO;
@@ -48,7 +54,13 @@ export default function App() {
         </>
       )}
 
-      {!playing && <Menu title={menu.title} detail={menu.detail} onStart={startGame} />}
+      {screen === "leaderboard" && (
+        <Leaderboard entries={loadLeaderboard(browserStorage())} onNewGame={newGame} />
+      )}
+
+      {(screen === "menu" || screen === "over") && (
+        <Menu title={menu.title} detail={menu.detail} onStart={startGame} />
+      )}
     </div>
   );
 }
