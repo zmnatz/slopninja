@@ -5,6 +5,7 @@ import { Hud } from "./components/Hud";
 import { Menu } from "./components/Menu";
 import { createGame, describeResult, summarize } from "./game/engine";
 import type { Game, GameMode, Snapshot } from "./game/types";
+import { type Screen, transition } from "./screen";
 
 const INTRO = {
   title: "FRUIT NINJA",
@@ -12,19 +13,24 @@ const INTRO = {
 };
 
 export default function App() {
+  const [screen, setScreen] = useState<Screen>("menu");
   const [game, setGame] = useState<Game | null>(null);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
 
-  const handleChange = useCallback((next: Snapshot) => setSnapshot(next), []);
+  const handleChange = useCallback((next: Snapshot) => {
+    setSnapshot(next);
+    if (next.status === "over") setScreen((current) => transition(current, { type: "ended" }));
+  }, []);
 
   const startGame = (mode: GameMode) => {
     const next = createGame(mode, window.innerWidth, window.innerHeight);
     setSnapshot(summarize(next));
     setGame(next);
+    setScreen((current) => transition(current, { type: "start" }));
   };
 
-  const playing = snapshot?.status === "playing";
-  const menu = snapshot?.status === "over" ? describeResult(snapshot) : INTRO;
+  const playing = screen === "playing";
+  const menu = screen === "over" && snapshot ? describeResult(snapshot) : INTRO;
 
   return (
     <div className="app">
