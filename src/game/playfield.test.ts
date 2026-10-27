@@ -1,5 +1,58 @@
 import { describe, expect, it } from "vitest";
-import { locate, sideRect, toScreen } from "./playfield";
+import { inSide, locate, midline, sideRect, toScreen } from "./playfield";
+
+// Records the canvas transform that inSide sets up, so the test can apply it to a point.
+function recordingContext() {
+  const transform = { tx: 0, ty: 0, angle: 0 };
+  const ctx = {
+    save: () => {},
+    restore: () => {},
+    beginPath: () => {},
+    rect: () => {},
+    clip: () => {},
+    translate: (x: number, y: number) => {
+      transform.tx = x;
+      transform.ty = y;
+    },
+    rotate: (angle: number) => {
+      transform.angle = angle;
+    },
+  };
+  return { ctx: ctx as unknown as CanvasRenderingContext2D, transform };
+}
+
+// Canvas applies translate then rotate: a frame point p lands at t + R(angle) * p.
+function applyTransform(transform: { tx: number; ty: number; angle: number }, x: number, y: number) {
+  const cos = Math.cos(transform.angle);
+  const sin = Math.sin(transform.angle);
+  return {
+    x: transform.tx + cos * x - sin * y,
+    y: transform.ty + sin * x + cos * y,
+  };
+}
+
+describe("drawing transform", () => {
+  it("draws each half where toScreen says its points belong, for both players", () => {
+    for (const side of ["top", "bottom"] as const) {
+      const { ctx, transform } = recordingContext();
+      let drawn = { x: 0, y: 0 };
+      inSide(ctx, 800, 600, side, () => {
+        drawn = applyTransform(transform, 100, 50);
+      });
+
+      const expected = toScreen(800, 600, side, 100, 50);
+      expect(drawn.x).toBeCloseTo(expected.x);
+      expect(drawn.y).toBeCloseTo(expected.y);
+    }
+  });
+});
+
+describe("midline", () => {
+  it("is half the screen height, and both halves meet there", () => {
+    expect(midline(600)).toBe(300);
+    expect(sideRect(800, 600, "top").height + midline(600)).toBe(600);
+  });
+});
 
 describe("locate", () => {
   it("puts a touch on the bottom half into the bottom player's frame", () => {

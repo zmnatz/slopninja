@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { createGame, placeFruit, sliceAt } from "./engine";
-import { fitCanvas, startSession } from "./session";
+import { fitCanvas, followViewport, startSession } from "./session";
 
 // A frame clock the test drives by hand, so frames happen only when the test asks.
 function manualFrames() {
@@ -104,5 +104,34 @@ describe("fitCanvas", () => {
     expect(setTransform).toHaveBeenCalledWith(2, 0, 0, 2, 0, 0);
     expect(game.width).toBe(800);
     expect(game.height).toBe(600);
+  });
+});
+
+describe("followViewport", () => {
+  it("fits the canvas now and again on every resize, then stops listening when told", () => {
+    const canvas = {
+      width: 0,
+      height: 0,
+      getContext: () => ({ setTransform: vi.fn() }),
+    } as unknown as HTMLCanvasElement;
+    const game = createGame(1, 1, 1);
+    let viewport = { width: 800, height: 600, ratio: 1 };
+    let listener: (() => void) | undefined;
+    const unsubscribe = vi.fn();
+    const subscribe = vi.fn((callback: () => void) => {
+      listener = callback;
+      return unsubscribe;
+    });
+
+    const stop = followViewport(canvas, game, () => viewport, subscribe);
+    expect(canvas.width).toBe(800);
+
+    viewport = { width: 1024, height: 768, ratio: 2 };
+    listener?.();
+    expect(canvas.width).toBe(2048);
+    expect(game.width).toBe(1024);
+
+    stop();
+    expect(unsubscribe).toHaveBeenCalledOnce();
   });
 });

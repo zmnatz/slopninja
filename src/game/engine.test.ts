@@ -103,10 +103,12 @@ describe("sliceAt", () => {
 });
 
 describe("placeFruit", () => {
-  it("rejects a fruit name that is not in the fruit table", () => {
+  it("only accepts fruit names from the fruit table, checked at compile time", () => {
     const game = createGame(1, 800, 600, noRandom);
 
-    expect(() => placeFruit(game, "bottom", "durian", 0, 0)).toThrow("Unknown fruit: durian");
+    placeFruit(game, "bottom", "apple", 0, 0);
+    // @ts-expect-error "durian" is not a fruit in the table, so the typecheck must reject it.
+    placeFruit(game, "bottom", "durian", 0, 0);
   });
 });
 

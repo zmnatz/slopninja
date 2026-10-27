@@ -1,4 +1,4 @@
-import { FRUIT_KINDS } from "./fruits";
+import { FRUIT_KINDS, type FruitName } from "./fruits";
 import { locate, type Side } from "./playfield";
 import type {
   Field,
@@ -35,6 +35,9 @@ const SPLATTER_ALPHA = 0.5;
 
 const SLICE_PADDING = 20;
 const TRAIL_LIFETIME_MS = 150;
+
+// Spawning picks uniformly from this list, in table order.
+const FRUIT_LIST = Object.values(FRUIT_KINDS);
 
 export function createGame(
   mode: GameMode,
@@ -121,11 +124,8 @@ export function sliceAt(game: Game, x: number, y: number): void {
  * Puts a fruit at a point in one player's own frame, at rest. This is how a board is set up
  * for a test or a tool, without reaching into the field's arrays.
  */
-export function placeFruit(game: Game, side: Side, name: string, x: number, y: number): void {
-  const kind = FRUIT_KINDS.find((candidate) => candidate.name === name);
-  if (!kind) throw new Error(`Unknown fruit: ${name}`);
-
-  game[side].fruits.push({ kind, x, y, vx: 0, vy: 0, rotation: 0, vRot: 0 });
+export function placeFruit(game: Game, side: Side, name: FruitName, x: number, y: number): void {
+  game[side].fruits.push({ kind: FRUIT_KINDS[name], x, y, vx: 0, vy: 0, rotation: 0, vRot: 0 });
 }
 
 export function createField(): Field {
@@ -147,7 +147,7 @@ function between(game: Game, min: number, max: number): number {
 function spawnFruit(game: Game): Fruit {
   const { random, width, height } = game;
   const x = between(game, 100, width - 100);
-  const kind = FRUIT_KINDS[Math.floor(random() * FRUIT_KINDS.length)];
+  const kind = FRUIT_LIST[Math.floor(random() * FRUIT_LIST.length)];
 
   return {
     kind,

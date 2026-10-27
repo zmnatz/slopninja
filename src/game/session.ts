@@ -14,7 +14,7 @@ export interface SessionDeps {
  * clock, the drawing, and the clock time are all injected, so a session runs without a browser.
  */
 export function startSession(game: Game, deps: SessionDeps): () => void {
-  let frame = 0;
+  let scheduled = 0;
   let last: Snapshot | null = null;
 
   const tick = () => {
@@ -27,11 +27,11 @@ export function startSession(game: Game, deps: SessionDeps): () => void {
       deps.onChange(next);
     }
 
-    if (game.status === "playing") frame = deps.schedule(tick);
+    if (game.status === "playing") scheduled = deps.schedule(tick);
   };
 
   tick();
-  return () => deps.cancel(frame);
+  return () => deps.cancel(scheduled);
 }
 
 export interface Viewport {
@@ -46,6 +46,22 @@ export function fitCanvas(canvas: HTMLCanvasElement, game: Game | null, viewport
   canvas.height = viewport.height * viewport.ratio;
   canvas.getContext("2d")?.setTransform(viewport.ratio, 0, 0, viewport.ratio, 0, 0);
   if (game) resizeGame(game, viewport.width, viewport.height);
+}
+
+/**
+ * Fits the canvas now, and again whenever the viewport changes. `subscribe` registers a
+ * listener for viewport changes and returns the function that removes it.
+ */
+export function followViewport(
+  canvas: HTMLCanvasElement,
+  game: Game | null,
+  viewport: () => Viewport,
+  subscribe: (listener: () => void) => () => void,
+): () => void {
+  const resize = () => fitCanvas(canvas, game, viewport());
+
+  resize();
+  return subscribe(resize);
 }
 
 function sameSnapshot(a: Snapshot, b: Snapshot | null): boolean {

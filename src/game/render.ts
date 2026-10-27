@@ -1,4 +1,4 @@
-import { inSide, sideRect, type Rect } from "./playfield";
+import { inSide, midline, sideRect, type Rect } from "./playfield";
 import type {
   Field,
   Fruit,
@@ -33,7 +33,6 @@ export function drawGame(ctx: Ctx, game: Game): void {
 
 function drawSplitScreen(ctx: Ctx, game: Game): void {
   const { width, height } = game;
-  const midY = height / 2;
 
   // The top player's half is drawn in their flipped frame, so it reads from across the table.
   inSide(ctx, width, height, "top", () => drawField(ctx, game.top));
@@ -42,11 +41,12 @@ function drawSplitScreen(ctx: Ctx, game: Game): void {
   inSide(ctx, width, height, "bottom", () => drawField(ctx, game.bottom));
   if (game.bottom.lives <= 0) drawEliminated(ctx, sideRect(width, height, "bottom"), false);
 
+  const y = midline(height);
   ctx.strokeStyle = DIVIDER;
   ctx.lineWidth = 4;
   ctx.beginPath();
-  ctx.moveTo(0, midY);
-  ctx.lineTo(width, midY);
+  ctx.moveTo(0, y);
+  ctx.lineTo(width, y);
   ctx.stroke();
 }
 

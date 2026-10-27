@@ -1,7 +1,7 @@
 import { useEffect, useRef, type PointerEvent } from "react";
 import { releasePointer, touchPoint } from "../game/engine";
 import { drawGame } from "../game/render";
-import { fitCanvas, startSession } from "../game/session";
+import { followViewport, startSession } from "../game/session";
 import type { Game, Snapshot } from "../game/types";
 
 interface GameCanvasProps {
@@ -17,16 +17,19 @@ export function GameCanvas({ game, onChange }: GameCanvasProps) {
     if (!canvas) return;
 
     // The backing store is scaled by devicePixelRatio so lines stay sharp on retina iPads.
-    const resize = () =>
-      fitCanvas(canvas, game, {
+    return followViewport(
+      canvas,
+      game,
+      () => ({
         width: window.innerWidth,
         height: window.innerHeight,
         ratio: window.devicePixelRatio || 1,
-      });
-
-    resize();
-    window.addEventListener("resize", resize);
-    return () => window.removeEventListener("resize", resize);
+      }),
+      (listener) => {
+        window.addEventListener("resize", listener);
+        return () => window.removeEventListener("resize", listener);
+      },
+    );
   }, [game]);
 
   useEffect(() => {
@@ -34,7 +37,7 @@ export function GameCanvas({ game, onChange }: GameCanvasProps) {
     if (!game || !ctx) return;
 
     return startSession(game, {
-      draw: (frame) => drawGame(ctx, frame),
+      draw: (current) => drawGame(ctx, current),
       onChange,
       schedule: (callback) => requestAnimationFrame(callback),
       cancel: (id) => cancelAnimationFrame(id),
