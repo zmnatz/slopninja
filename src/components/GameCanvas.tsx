@@ -1,6 +1,7 @@
 import { useEffect, useRef, type PointerEvent } from "react";
-import { releasePointer, resizeGame, stepGame, summarize, touchPoint } from "../game/engine";
+import { releasePointer, touchPoint } from "../game/engine";
 import { drawGame } from "../game/render";
+import { fitCanvas, startSession } from "../game/session";
 import type { Game, Snapshot } from "../game/types";
 
 interface GameCanvasProps {
@@ -15,14 +16,13 @@ export function GameCanvas({ game, onChange }: GameCanvasProps) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Backing store is scaled by devicePixelRatio so lines stay sharp on retina iPads.
-    const resize = () => {
-      const ratio = window.devicePixelRatio || 1;
-      canvas.width = window.innerWidth * ratio;
-      canvas.height = window.innerHeight * ratio;
-      canvas.getContext("2d")?.setTransform(ratio, 0, 0, ratio, 0, 0);
-      if (game) resizeGame(game, window.innerWidth, window.innerHeight);
-    };
+    // The backing store is scaled by devicePixelRatio so lines stay sharp on retina iPads.
+    const resize = () =>
+      fitCanvas(canvas, game, {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        ratio: window.devicePixelRatio || 1,
+      });
 
     resize();
     window.addEventListener("resize", resize);
@@ -33,24 +33,13 @@ export function GameCanvas({ game, onChange }: GameCanvasProps) {
     const ctx = canvasRef.current?.getContext("2d");
     if (!game || !ctx) return;
 
-    let frame = 0;
-    let last: Snapshot | null = null;
-
-    const tick = () => {
-      stepGame(game, performance.now());
-      drawGame(ctx, game);
-
-      const next = summarize(game);
-      if (!sameSnapshot(next, last)) {
-        last = next;
-        onChange(next);
-      }
-
-      if (game.status === "playing") frame = requestAnimationFrame(tick);
-    };
-
-    tick();
-    return () => cancelAnimationFrame(frame);
+    return startSession(game, {
+      draw: (frame) => drawGame(ctx, frame),
+      onChange,
+      schedule: (callback) => requestAnimationFrame(callback),
+      cancel: (id) => cancelAnimationFrame(id),
+      now: () => performance.now(),
+    });
   }, [game, onChange]);
 
   const handlePointer = (event: PointerEvent<HTMLCanvasElement>) => {
@@ -78,17 +67,5 @@ export function GameCanvas({ game, onChange }: GameCanvasProps) {
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
     />
-  );
-}
-
-function sameSnapshot(a: Snapshot, b: Snapshot | null): boolean {
-  return (
-    b !== null &&
-    a.status === b.status &&
-    a.mode === b.mode &&
-    a.bottom.score === b.bottom.score &&
-    a.bottom.lives === b.bottom.lives &&
-    a.top.score === b.top.score &&
-    a.top.lives === b.top.lives
   );
 }

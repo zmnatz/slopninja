@@ -1,19 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { createGame, describeResult, sliceAt, stepGame, summarize, touchPoint } from "./engine";
-import { FRUIT_KINDS } from "./fruits";
-import type { Fruit, FruitKind, Snapshot } from "./types";
+import {
+  createGame,
+  describeResult,
+  placeFruit,
+  sliceAt,
+  stepGame,
+  summarize,
+  touchPoint,
+} from "./engine";
+import type { Snapshot } from "./types";
 
 const noRandom = () => 0.5;
-
-function kindNamed(name: string): FruitKind {
-  const kind = FRUIT_KINDS.find((candidate) => candidate.name === name);
-  if (!kind) throw new Error(`Unknown fruit kind: ${name}`);
-  return kind;
-}
-
-function fruitAt(name: string, x: number, y: number): Fruit {
-  return { kind: kindNamed(name), x, y, vx: 0, vy: 0, rotation: 0, vRot: 0 };
-}
 
 describe("createGame", () => {
   it("starts both players with three lives and no score", () => {
@@ -32,7 +29,7 @@ describe("createGame", () => {
 describe("sliceAt", () => {
   it("scores a fruit in 1-player mode and splits it into halves", () => {
     const game = createGame(1, 800, 600, noRandom);
-    game.bottom.fruits.push(fruitAt("apple", 400, 300));
+    placeFruit(game, "bottom", "apple", 400, 300);
 
     sliceAt(game, 405, 300);
 
@@ -43,7 +40,7 @@ describe("sliceAt", () => {
 
   it("gives a banana two points", () => {
     const game = createGame(1, 800, 600, noRandom);
-    game.bottom.fruits.push(fruitAt("banana", 200, 200));
+    placeFruit(game, "bottom", "banana", 200, 200);
 
     sliceAt(game, 200, 200);
 
@@ -52,7 +49,7 @@ describe("sliceAt", () => {
 
   it("costs a life when a bomb is sliced", () => {
     const game = createGame(1, 800, 600, noRandom);
-    game.bottom.fruits.push(fruitAt("bomb", 100, 100));
+    placeFruit(game, "bottom", "bomb", 100, 100);
 
     sliceAt(game, 100, 100);
 
@@ -63,7 +60,7 @@ describe("sliceAt", () => {
   it("ends a 1-player game when the last life is lost", () => {
     const game = createGame(1, 800, 600, noRandom);
     game.bottom.lives = 1;
-    game.bottom.fruits.push(fruitAt("bomb", 100, 100));
+    placeFruit(game, "bottom", "bomb", 100, 100);
 
     sliceAt(game, 100, 100);
 
@@ -74,7 +71,7 @@ describe("sliceAt", () => {
     const game = createGame(2, 800, 600, noRandom);
     game.top.lives = 0;
     game.bottom.lives = 1;
-    game.bottom.fruits.push(fruitAt("bomb", 100, 100));
+    placeFruit(game, "bottom", "bomb", 100, 100);
 
     // Bottom player's touch at screen (100, 400) is local (100, 100).
     sliceAt(game, 100, 400);
@@ -86,7 +83,7 @@ describe("sliceAt", () => {
   it("maps a touch on the top half to the top player's field", () => {
     const game = createGame(2, 800, 600, noRandom);
     // Top player's local coordinates are (width - x, midY - y), so (100, 50) is screen (700, 250).
-    game.top.fruits.push(fruitAt("orange", 100, 50));
+    placeFruit(game, "top", "orange", 100, 50);
 
     sliceAt(game, 700, 250);
 
@@ -97,11 +94,19 @@ describe("sliceAt", () => {
   it("ignores touches after the game is over", () => {
     const game = createGame(1, 800, 600, noRandom);
     game.status = "over";
-    game.bottom.fruits.push(fruitAt("apple", 400, 300));
+    placeFruit(game, "bottom", "apple", 400, 300);
 
     sliceAt(game, 400, 300);
 
     expect(game.bottom.score).toBe(0);
+  });
+});
+
+describe("placeFruit", () => {
+  it("rejects a fruit name that is not in the fruit table", () => {
+    const game = createGame(1, 800, 600, noRandom);
+
+    expect(() => placeFruit(game, "bottom", "durian", 0, 0)).toThrow("Unknown fruit: durian");
   });
 });
 

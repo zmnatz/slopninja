@@ -1,4 +1,5 @@
 import { FRUIT_KINDS } from "./fruits";
+import { locate, type Side } from "./playfield";
 import type {
   Field,
   Fruit,
@@ -112,17 +113,19 @@ export function releasePointer(game: Game, pointerId: number): void {
 export function sliceAt(game: Game, x: number, y: number): void {
   if (game.status !== "playing") return;
 
-  if (game.mode === 1) {
-    sliceField(game, game.bottom, x, y);
-    return;
-  }
+  const local = locate(game.mode, game.width, game.height, x, y);
+  sliceField(game, game[local.side], local.x, local.y);
+}
 
-  const midY = game.height / 2;
-  if (y > midY) {
-    sliceField(game, game.bottom, x, y - midY);
-  } else {
-    sliceField(game, game.top, game.width - x, midY - y);
-  }
+/**
+ * Puts a fruit at a point in one player's own frame, at rest. This is how a board is set up
+ * for a test or a tool, without reaching into the field's arrays.
+ */
+export function placeFruit(game: Game, side: Side, name: string, x: number, y: number): void {
+  const kind = FRUIT_KINDS.find((candidate) => candidate.name === name);
+  if (!kind) throw new Error(`Unknown fruit: ${name}`);
+
+  game[side].fruits.push({ kind, x, y, vx: 0, vy: 0, rotation: 0, vRot: 0 });
 }
 
 export function createField(): Field {
