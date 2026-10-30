@@ -1,5 +1,5 @@
 import { FRUIT_KINDS, type FruitName } from "./fruits";
-import { locate, type Side } from "./playfield";
+import { locate, midline, type Side } from "./playfield";
 import type {
   Field,
   Fruit,
@@ -21,6 +21,8 @@ const POINTS_PER_SPEEDUP = 5;
 const FRUIT_GRAVITY = 0.35;
 const FRUIT_FLOOR_MARGIN = 100;
 const FRUIT_CEILING_MARGIN = 50;
+// The highest a toss may rise, as a share of the player's frame height.
+const MAX_APEX_FRACTION = 0.85;
 
 const HALF_GRAVITY = 0.38;
 const HALF_DECAY = 0.02;
@@ -144,18 +146,29 @@ function between(game: Game, min: number, max: number): number {
   return min + game.random() * (max - min);
 }
 
+/**
+ * The height of the space a player's fruit moves in. In 1-player mode that is the whole screen.
+ * In 2-player mode each player has their own half, measured from the midline to their edge.
+ */
+function frameHeight(game: Game): number {
+  return game.mode === 1 ? game.height : midline(game.height);
+}
+
 function spawnFruit(game: Game): Fruit {
-  const { random, width, height } = game;
+  const { random, width } = game;
+  const frame = frameHeight(game);
   const x = between(game, 100, width - 100);
   const kind = FRUIT_LIST[Math.floor(random() * FRUIT_LIST.length)];
 
   return {
     kind,
     x,
-    y: height / 2,
+    // Fruit is launched from the player's own edge, so it comes up from the bottom of the screen.
+    y: frame,
     // Fruit is lobbed toward the middle of the screen so it stays in reach.
     vx: (width / 2 - x) / 35 + (random() - 0.5) * 4,
-    vy: -(random() * 4 + 13),
+    // The toss is capped so the arc never reaches past the midline into the other player's half.
+    vy: -Math.min(random() * 4 + 13, Math.sqrt(2 * FRUIT_GRAVITY * frame * MAX_APEX_FRACTION)),
     rotation: 0,
     vRot: (random() - 0.5) * 0.08,
   };
@@ -173,7 +186,7 @@ function stepField(game: Game, field: Field): void {
     }
   }
 
-  const floor = game.height / 2 + FRUIT_FLOOR_MARGIN;
+  const floor = frameHeight(game) + FRUIT_FLOOR_MARGIN;
   for (const fruit of field.fruits) {
     fruit.x += fruit.vx;
     fruit.y += fruit.vy;
