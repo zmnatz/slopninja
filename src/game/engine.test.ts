@@ -112,6 +112,42 @@ describe("placeFruit", () => {
   });
 });
 
+describe("fruit physics", () => {
+  // Enough frames for the first fruit to spawn (the spawn timer runs for 56 frames).
+  const FIRST_SPAWN_FRAMES = 56;
+
+  it("launches a single-player fruit from the bottom edge of the screen", () => {
+    const game = createGame(1, 800, 600, noRandom);
+
+    for (let frame = 0; frame < FIRST_SPAWN_FRAMES; frame++) stepGame(game, frame);
+
+    const [fruit] = game.bottom.fruits;
+    expect(fruit).toBeDefined();
+    // One frame after launch the fruit has only just left the bottom edge.
+    expect(fruit.y).toBeGreaterThan(600 * 0.9);
+  });
+
+  it("keeps every two-player fruit inside its own half, however it is thrown", () => {
+    for (const random of [() => 0, noRandom, () => 0.999]) {
+      const game = createGame(2, 800, 600, random);
+      let launched = 0;
+
+      for (let frame = 0; frame < 900; frame++) {
+        stepGame(game, frame);
+        for (const field of [game.bottom, game.top]) {
+          for (const fruit of field.fruits) {
+            launched++;
+            // Field coordinates measure from the midline, so a fruit may never go below zero.
+            expect(fruit.y).toBeGreaterThanOrEqual(0);
+          }
+        }
+      }
+
+      expect(launched).toBeGreaterThan(0);
+    }
+  });
+});
+
 describe("touchPoint and stepGame", () => {
   it("drops trail points older than 150ms", () => {
     const game = createGame(1, 800, 600, noRandom);
