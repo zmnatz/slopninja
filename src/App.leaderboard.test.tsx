@@ -32,6 +32,7 @@ describe("App leaderboard", () => {
     fireEvent.click(screen.getByRole("button", { name: "OK" }));
 
     expect(screen.getByText("ZAV")).toBeInTheDocument();
+    expect(screen.getByText(/you placed 1st!/)).toBeInTheDocument();
     expect(JSON.parse(localStorage.getItem("slopninja.leaderboard")!)).toEqual([{ name: "ZAV", score: 30 }]);
 
     fireEvent.click(screen.getByRole("button", { name: "NEW GAME" }));

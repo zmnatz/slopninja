@@ -8,11 +8,20 @@ interface LeaderboardProps {
   onNewGame: () => void;
 }
 
+function ordinal(n: number): string {
+  const rem = n % 100;
+  if (rem >= 11 && rem <= 13) return `${n}th`;
+  return `${n}${["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
+}
+
 export function Leaderboard({ entries, highlight, score, onNewGame }: LeaderboardProps) {
   return (
     <div className="menu leaderboard">
       <h1>TOP 10</h1>
-      <p>Your score: {score}</p>
+      <p>
+        Your score: {score}
+        {highlight !== undefined && ` — you placed ${ordinal(highlight + 1)}!`}
+      </p>
       {entries.length === 0 ? (
         <p>No scores yet.</p>
       ) : (
