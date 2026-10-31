@@ -3,7 +3,8 @@ import react from "@vitejs/plugin-react";
 
 // https://viteplus.dev/config/
 export default defineConfig({
-  base: "/slopninja/",
+  // PR previews are served from a sub-path, so the workflow overrides the base.
+  base: process.env.BASE_PATH ?? "/slopninja/",
   plugins: [react()],
   test: {
     environment: "jsdom",
