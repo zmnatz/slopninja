@@ -5,10 +5,11 @@ interface MenuProps {
   title: string;
   detail: string;
   onStart: (mode: GameMode) => void;
+  onShowScores?: () => void;
   modes?: readonly ModeOption[];
 }
 
-export function Menu({ title, detail, onStart, modes = GAME_MODES }: MenuProps) {
+export function Menu({ title, detail, onStart, onShowScores, modes = GAME_MODES }: MenuProps) {
   return (
     <div className="menu">
       <h1>{title}</h1>
@@ -31,6 +32,11 @@ export function Menu({ title, detail, onStart, modes = GAME_MODES }: MenuProps) 
           </button>
         ))}
       </div>
+      {onShowScores && (
+        <button type="button" onClick={onShowScores}>
+          TOP 10
+        </button>
+      )}
     </div>
   );
 }

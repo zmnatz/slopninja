@@ -39,3 +39,20 @@ describe("transition with a leaderboard", () => {
     expect(transition("menu", { type: "newGame" })).toBe("menu");
   });
 });
+
+describe("transition to the browsable leaderboard", () => {
+  it("opens the leaderboard from the menu and returns to it", () => {
+    const scores = transition("menu", { type: "viewScores" });
+    expect(scores).toBe("scores");
+    expect(transition(scores, { type: "back" })).toBe("menu");
+  });
+
+  it("ignores view and back events on the wrong screen", () => {
+    expect(transition("playing", { type: "viewScores" })).toBe("playing");
+    expect(transition("menu", { type: "back" })).toBe("menu");
+  });
+
+  it("starts a game from the leaderboard", () => {
+    expect(transition("leaderboard", { type: "start" })).toBe("playing");
+  });
+});

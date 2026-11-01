@@ -71,18 +71,39 @@ export default function App() {
         </>
       )}
 
-      {screen === "naming" && snapshot && <NameEntry score={snapshot.bottom.score} onSubmit={submitName} />}
+      {screen === "naming" && snapshot && (
+        <NameEntry score={snapshot.bottom.score} onSubmit={submitName} />
+      )}
 
       {screen === "leaderboard" && snapshot && (
         <Leaderboard
           entries={entries}
           highlight={highlight}
           score={snapshot.bottom.score}
+          onPlayAgain={() => startGame(snapshot.mode)}
           onNewGame={() => setScreen((current) => transition(current, { type: "newGame" }))}
         />
       )}
 
-      {(screen === "menu" || screen === "over") && <Menu title={menu.title} detail={menu.detail} onStart={startGame} />}
+      {screen === "scores" && (
+        <Leaderboard
+          entries={entries}
+          onBack={() => setScreen((current) => transition(current, { type: "back" }))}
+        />
+      )}
+
+      {(screen === "menu" || screen === "over") && (
+        <Menu
+          title={menu.title}
+          detail={menu.detail}
+          onStart={startGame}
+          onShowScores={
+            screen === "menu"
+              ? () => setScreen((current) => transition(current, { type: "viewScores" }))
+              : undefined
+          }
+        />
+      )}
     </div>
   );
 }

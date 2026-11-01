@@ -4,8 +4,11 @@ interface LeaderboardProps {
   entries: LeaderboardEntry[];
   /** The row just added by this round's player, if any. */
   highlight?: number;
-  score: number;
-  onNewGame: () => void;
+  /** The score of the round just played. Omitted when browsing from the menu. */
+  score?: number;
+  onNewGame?: () => void;
+  onPlayAgain?: () => void;
+  onBack?: () => void;
 }
 
 function ordinal(n: number): string {
@@ -14,14 +17,23 @@ function ordinal(n: number): string {
   return `${n}${["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
 }
 
-export function Leaderboard({ entries, highlight, score, onNewGame }: LeaderboardProps) {
+export function Leaderboard({
+  entries,
+  highlight,
+  score,
+  onNewGame,
+  onPlayAgain,
+  onBack,
+}: LeaderboardProps) {
   return (
     <div className="menu leaderboard">
       <h1>TOP 10</h1>
-      <p>
-        Your score: {score}
-        {highlight !== undefined && ` — you placed ${ordinal(highlight + 1)}!`}
-      </p>
+      {score !== undefined && (
+        <p>
+          Your score: {score}
+          {highlight !== undefined && ` — you placed ${ordinal(highlight + 1)}!`}
+        </p>
+      )}
       {entries.length === 0 ? (
         <p>No scores yet.</p>
       ) : (
@@ -34,9 +46,21 @@ export function Leaderboard({ entries, highlight, score, onNewGame }: Leaderboar
           ))}
         </ol>
       )}
-      <button type="button" onClick={onNewGame}>
-        NEW GAME
-      </button>
+      {onPlayAgain && (
+        <button type="button" onClick={onPlayAgain}>
+          PLAY AGAIN
+        </button>
+      )}
+      {onNewGame && (
+        <button type="button" onClick={onNewGame}>
+          NEW GAME
+        </button>
+      )}
+      {onBack && (
+        <button type="button" onClick={onBack}>
+          BACK
+        </button>
+      )}
     </div>
   );
 }
