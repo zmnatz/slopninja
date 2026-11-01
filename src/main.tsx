@@ -10,7 +10,8 @@ createRoot(document.getElementById("root")!).render(
 );
 
 // Only in production: a cache-first worker would otherwise serve stale modules during `npm run dev`.
-if ("serviceWorker" in navigator && import.meta.env.PROD) {
+// Not in PR previews either, which update on every push and would be served stale.
+if ("serviceWorker" in navigator && import.meta.env.PROD && !import.meta.env.VITE_PREVIEW) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js");
   });
