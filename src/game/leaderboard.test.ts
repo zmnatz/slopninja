@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { addEntry, loadLeaderboard, qualifies, saveLeaderboard, type LeaderboardEntry } from "./leaderboard";
 
 const full = (): LeaderboardEntry[] =>

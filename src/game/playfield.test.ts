@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { inSide, locate, midline, sideRect, toScreen } from "./playfield";
 
 // Records the canvas transform that inSide sets up, so the test can apply it to a point.

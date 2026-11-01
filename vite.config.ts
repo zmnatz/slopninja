@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
-import { playwright } from "@vitest/browser-playwright";
+import { playwright } from "vite-plus/test/browser-playwright";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -41,7 +41,9 @@ export default defineConfig({
   },
   lint: {
     plugins: ["react", "typescript", "oxc"],
+    jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
     rules: {
+      "vite-plus/prefer-vite-plus-imports": "error",
       "react/rules-of-hooks": "error",
       "react/only-export-components": ["warn", { allowConstantExport: true }],
     },

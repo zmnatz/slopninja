@@ -25,13 +25,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: voidzero-dev/setup-vp@v1.22.0
         with:
-          node-version: 22
-      - run: npm ci
+          node-version: "24"
+          cache: true
       # The Storybook tests run the stories in a real browser.
-      - run: npx playwright install --with-deps chromium
-      - run: npm test
+      - run: vp exec playwright install --with-deps chromium
+      - run: vp test run
 
   production:
     if: github.event_name != 'pull_request'
@@ -39,10 +39,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: voidzero-dev/setup-vp@v1.22.0
         with:
-          node-version: 22
-      - run: npm ci && npm run build
+          node-version: "24"
+          cache: true
+      - run: vp run build
       - uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: dist
@@ -56,10 +57,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: voidzero-dev/setup-vp@v1.22.0
         with:
-          node-version: 22
-      - run: npm ci && npm run build
+          node-version: "24"
+          cache: true
+      - run: vp run build
         env:
           BASE_PATH: /${{ github.event.repository.name }}/pr-preview/pr-${{ github.event.number }}/
           VITE_PREVIEW: "true"
