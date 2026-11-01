@@ -28,7 +28,10 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
-      - run: npm ci && npm test
+      - run: npm ci
+      # The Storybook tests run the stories in a real browser.
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
 
   production:
     if: github.event_name != 'pull_request'
