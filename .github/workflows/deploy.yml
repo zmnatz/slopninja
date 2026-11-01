@@ -25,13 +25,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 22
-      - run: npm ci
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
       # The Storybook tests run the stories in a real browser.
-      - run: npx playwright install --with-deps chromium
-      - run: npm test
+      - run: bunx playwright install --with-deps chromium
+      - run: bun run test
 
   production:
     if: github.event_name != 'pull_request'
@@ -39,10 +37,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 22
-      - run: npm ci && npm run build
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile && bun run build
       - uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: dist
@@ -56,10 +52,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 22
-      - run: npm ci && npm run build
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile && bun run build
         env:
           BASE_PATH: /${{ github.event.repository.name }}/pr-preview/pr-${{ github.event.number }}/
           VITE_PREVIEW: "true"

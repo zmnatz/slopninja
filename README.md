@@ -5,11 +5,11 @@ Slice the fruit, avoid the bombs. One or two players on one iPad.
 ## Develop
 
 ```sh
-npm install
-npm run dev      # dev server
-npm test         # unit tests
-npm run lint
-npm run build    # production build into dist/
+bun install
+bun run dev      # dev server
+bun run test     # unit tests
+bun run lint
+bun run build    # production build into dist/
 ```
 
 ## Deploy
