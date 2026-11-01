@@ -7,7 +7,7 @@ const entries = Array.from({ length: 10 }, (_, i) => ({ name: "CBA", score: (10 
 const meta = {
   title: "Components/Leaderboard",
   component: Leaderboard,
-  args: { entries, score: 45, onNewGame: fn() },
+  args: { entries, score: 45, onNewGame: fn(), onPlayAgain: fn() },
 } satisfies Meta<typeof Leaderboard>;
 
 export default meta;
@@ -21,3 +21,8 @@ export const JustPlaced: Story = { args: { highlight: 5 } };
 
 /** First run, before any score is saved. */
 export const Empty: Story = { args: { entries: [], score: 0 } };
+
+/** Opened from the main menu: no round was played, so there is no score or Play again. */
+export const FromMenu: Story = {
+  args: { score: undefined, onNewGame: undefined, onPlayAgain: undefined, onBack: fn() },
+};

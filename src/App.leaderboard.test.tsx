@@ -28,12 +28,15 @@ describe("App leaderboard", () => {
     fireEvent.click(screen.getByRole("button", { name: "SOLO" }));
     act(() => report(over(1, 30)));
 
-    for (const letter of ["Z", "A", "V"]) fireEvent.click(screen.getByRole("button", { name: letter }));
+    for (const letter of ["Z", "A", "V"])
+      fireEvent.click(screen.getByRole("button", { name: letter }));
     fireEvent.click(screen.getByRole("button", { name: "OK" }));
 
     expect(screen.getByText("ZAV")).toBeInTheDocument();
     expect(screen.getByText(/you placed 1st!/)).toBeInTheDocument();
-    expect(JSON.parse(localStorage.getItem("slopninja.leaderboard")!)).toEqual([{ name: "ZAV", score: 30 }]);
+    expect(JSON.parse(localStorage.getItem("slopninja.leaderboard")!)).toEqual([
+      { name: "ZAV", score: 30 },
+    ]);
 
     fireEvent.click(screen.getByRole("button", { name: "NEW GAME" }));
     expect(screen.getByRole("button", { name: "SOLO" })).toBeInTheDocument();
@@ -58,5 +61,31 @@ describe("App leaderboard", () => {
 
     expect(screen.getByRole("heading", { name: "PLAYER 1 (BOTTOM) WINS!" })).toBeInTheDocument();
     expect(screen.queryByText("NEW GAME")).not.toBeInTheDocument();
+  });
+
+  it("restarts the same mode with Play again", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "SOLO" }));
+    act(() => report(over(1, 0)));
+
+    fireEvent.click(screen.getByRole("button", { name: "PLAY AGAIN" }));
+
+    expect(screen.queryByRole("heading", { name: "TOP 10" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "SOLO" })).not.toBeInTheDocument();
+    act(() => report(over(1, 0)));
+    expect(screen.getByRole("heading", { name: "TOP 10" })).toBeInTheDocument();
+  });
+
+  it("shows the saved leaderboard from the menu and goes back", () => {
+    localStorage.setItem("slopninja.leaderboard", JSON.stringify([{ name: "ABC", score: 12 }]));
+    render(<App />);
+
+    fireEvent.click(screen.getByRole("button", { name: "TOP 10" }));
+    expect(screen.getByText("ABC")).toBeInTheDocument();
+    expect(screen.queryByText(/Your score/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "PLAY AGAIN" })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "BACK" }));
+    expect(screen.getByRole("button", { name: "SOLO" })).toBeInTheDocument();
   });
 });

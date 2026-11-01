@@ -34,4 +34,14 @@ describe("Menu", () => {
     expect(screen.getAllByRole("button")).toHaveLength(3);
     expect(screen.getByRole("button", { name: "PRACTICE" })).toHaveTextContent("3");
   });
+
+  it("shows a Top 10 button only when a handler is given", () => {
+    const onShowScores = vi.fn();
+    const { rerender } = render(<Menu title="FRUIT NINJA" detail="" onStart={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: "TOP 10" })).not.toBeInTheDocument();
+
+    rerender(<Menu title="FRUIT NINJA" detail="" onStart={vi.fn()} onShowScores={onShowScores} />);
+    fireEvent.click(screen.getByRole("button", { name: "TOP 10" }));
+    expect(onShowScores).toHaveBeenCalled();
+  });
 });
