@@ -11,7 +11,8 @@
     "test": "vp test run",
     "prepare": "vp config",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "format": "vp fmt"
   },
   "dependencies": {
     "react": "^19.1.1",
@@ -37,11 +38,11 @@
     "vite-plus": "1.4.0"
   },
   "overrides": {
-    "vite": "npm:@voidzero-dev/vite-plus-core@1.4.0",
-    "vitest": "5.0.5",
     "storybook": {
       "vite-plus": "$vite-plus"
-    }
+    },
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.4.0",
+    "vitest": "5.0.5"
   },
   "devEngines": {
     "packageManager": {

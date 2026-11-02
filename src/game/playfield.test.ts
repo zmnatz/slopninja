@@ -22,7 +22,11 @@ function recordingContext() {
 }
 
 // Canvas applies translate then rotate: a frame point p lands at t + R(angle) * p.
-function applyTransform(transform: { tx: number; ty: number; angle: number }, x: number, y: number) {
+function applyTransform(
+  transform: { tx: number; ty: number; angle: number },
+  x: number,
+  y: number,
+) {
   const cos = Math.cos(transform.angle);
   const sin = Math.sin(transform.angle);
   return {

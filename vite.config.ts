@@ -39,6 +39,7 @@ export default defineConfig({
       },
     ],
   },
+  fmt: {},
   lint: {
     plugins: ["react", "typescript", "oxc"],
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],

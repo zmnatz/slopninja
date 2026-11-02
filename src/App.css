@@ -72,7 +72,9 @@
   color: #ffaa00;
   letter-spacing: 2px;
   text-align: center;
-  text-shadow: 3px 3px 0 #ff3300, 5px 5px 15px rgba(0, 0, 0, 0.5);
+  text-shadow:
+    3px 3px 0 #ff3300,
+    5px 5px 15px rgba(0, 0, 0, 0.5);
 }
 
 .menu p {
@@ -132,12 +134,16 @@ button {
   box-shadow: var(--shadow);
   cursor: pointer;
   touch-action: manipulation;
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
 }
 
 button:active {
   transform: translateY(4px);
-  box-shadow: 0 2px 0 #b36b00, 0 5px 10px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    0 2px 0 #b36b00,
+    0 5px 10px rgba(0, 0, 0, 0.4);
 }
 
 /* iPhone in portrait: the screen is narrow, so stack the buttons and shrink the type. */

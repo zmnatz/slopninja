@@ -45,7 +45,13 @@ function frameFor(width: number, height: number, side: Side): Frame {
  * Maps a screen touch into the frame of the player it belongs to. A touch exactly on the
  * midline belongs to the top player, as it always has.
  */
-export function locate(mode: GameMode, width: number, height: number, x: number, y: number): LocalPoint {
+export function locate(
+  mode: GameMode,
+  width: number,
+  height: number,
+  x: number,
+  y: number,
+): LocalPoint {
   if (mode === 1) return { side: "bottom", x, y };
 
   const side: Side = y > midline(height) ? "bottom" : "top";
@@ -69,7 +75,13 @@ export function sideRect(width: number, height: number, side: Side): Rect {
 }
 
 /** Runs `draw` in a player's frame, clipped to their half. */
-export function inSide(ctx: Ctx, width: number, height: number, side: Side, draw: () => void): void {
+export function inSide(
+  ctx: Ctx,
+  width: number,
+  height: number,
+  side: Side,
+  draw: () => void,
+): void {
   const rect = sideRect(width, height, side);
   const frame = frameFor(width, height, side);
 

@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
-import { addEntry, loadLeaderboard, qualifies, saveLeaderboard, type LeaderboardEntry } from "./leaderboard";
+import {
+  addEntry,
+  loadLeaderboard,
+  qualifies,
+  saveLeaderboard,
+  type LeaderboardEntry,
+} from "./leaderboard";
 
 const full = (): LeaderboardEntry[] =>
   Array.from({ length: 10 }, (_, i) => ({ name: "AAA", score: (10 - i) * 10 }));
@@ -24,7 +30,10 @@ describe("leaderboard", () => {
     expect(loadLeaderboard()).toEqual([]);
     localStorage.setItem("slopninja.leaderboard", JSON.stringify({ a: 1 }));
     expect(loadLeaderboard()).toEqual([]);
-    localStorage.setItem("slopninja.leaderboard", JSON.stringify([{ name: "A" }, { name: "BOB", score: 3 }]));
+    localStorage.setItem(
+      "slopninja.leaderboard",
+      JSON.stringify([{ name: "A" }, { name: "BOB", score: 3 }]),
+    );
     expect(loadLeaderboard()).toEqual([{ name: "BOB", score: 3 }]);
   });
 

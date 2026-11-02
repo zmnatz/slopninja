@@ -57,7 +57,9 @@ describe("startSession", () => {
     sliceAt(game, 400, 300);
     frames.runFrame();
 
-    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ bottom: { score: 1, lives: 3 } }));
+    expect(onChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ bottom: { score: 1, lives: 3 } }),
+    );
   });
 
   it("stops scheduling frames once the game is over", () => {

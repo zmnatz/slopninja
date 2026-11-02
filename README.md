@@ -11,6 +11,7 @@ vp install
 vp dev          # dev server
 vp test run     # unit and Storybook tests
 vp lint
+vp fmt          # format (CI and the pre-commit hook run `vp fmt --check`)
 vp run build    # production build into dist/
 vp run storybook
 ```
@@ -22,7 +23,8 @@ vp run storybook
 - **React + TypeScript**, with the latest versions that Vite+ and Storybook support.
 - **Storybook** with the Vitest addon: every story runs as a browser test (Playwright Chromium) alongside the unit tests. First run needs `vp exec playwright install chromium`.
 - **Tests** import from `vite-plus/test`, not `vitest`, to satisfy the `prefer-vite-plus-imports` lint rule.
-- **Pre-commit hook** (`.vite-hooks/pre-commit`) runs `vp lint`, `vp run build`, and `vp test run`.
+- **Formatter** is Oxfmt through `vp fmt` (config in the `fmt` block of `vite.config.ts`).
+- **Pre-commit hook** (`.vite-hooks/pre-commit`) runs `vp fmt --check`, `vp lint`, `vp run build`, and `vp test run`.
 
 ## Deploy
 

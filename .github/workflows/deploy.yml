@@ -29,6 +29,8 @@ jobs:
         with:
           node-version: "24"
           cache: true
+      - run: vp fmt --check
+      - run: vp lint
       # The Storybook tests run the stories in a real browser.
       - run: vp exec playwright install --with-deps chromium
       - run: vp test run
